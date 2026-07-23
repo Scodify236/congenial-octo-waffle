@@ -242,6 +242,24 @@
                     logsHtml = `<li style="color: var(--text-sub); text-align: center; padding: 1rem;">No recent activities logged.</li>`;
                 }
 
+                // Blocked / Restricted Apps list (for unblocking even if not currently running)
+                let blockedHtml = '';
+                if (data.blocked_packages && data.blocked_packages.length > 0) {
+                    blockedHtml = data.blocked_packages.map(pkg => `
+                        <tr>
+                            <td>
+                                <span class="app-name">${pkg}</span>
+                            </td>
+                            <td><span class="badge badge-blocked">Restricted</span></td>
+                            <td>
+                                <button onclick="unblockApp('${pkg}')" class="btn btn-success">Unblock App</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    blockedHtml = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub); padding: 1rem;">No restricted applications. All apps permitted.</td></tr>`;
+                }
+
                 mainContainer.innerHTML = `
                     <div class="dashboard-grid">
                         <div class="card">
@@ -257,6 +275,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>${appsHtml}</tbody>
+                            </table>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">🚫 Restricted Apps (Active Policies)</h2>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Package Name</th>
+                                        <th>Policy Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${blockedHtml}</tbody>
                             </table>
                         </div>
 
