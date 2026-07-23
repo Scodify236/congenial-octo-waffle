@@ -1,167 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Security & Device Dashboard</title>
+    <title>Family Sentinel · Device Intelligence Control</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0f19;
-            --card: #151c2c;
-            --card-border: #232d42;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --danger: #f43f5e;
-            --danger-hover: #e11d48;
-            --success: #10b981;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
+            --color-bg: oklch(0.12 0.02 260);
+            --color-surface: oklch(0.16 0.025 260);
+            --color-surface-elevated: oklch(0.20 0.03 260);
+            --color-border: oklch(0.26 0.03 260);
+            --color-border-subtle: oklch(0.20 0.02 260);
+            
+            --color-accent: oklch(0.65 0.22 265);
+            --color-accent-hover: oklch(0.58 0.24 265);
+            --color-accent-subtle: oklch(0.25 0.08 265);
+            
+            --color-danger: oklch(0.62 0.22 25);
+            --color-danger-hover: oklch(0.54 0.24 25);
+            --color-danger-subtle: oklch(0.22 0.08 25);
+            
+            --color-success: oklch(0.72 0.19 155);
+            --color-success-subtle: oklch(0.22 0.06 155);
+
+            --color-text-main: oklch(0.96 0.01 260);
+            --color-text-muted: oklch(0.68 0.03 260);
+            --color-text-dim: oklch(0.48 0.03 260);
+
+            --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
-        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 1.5rem; min-height: 100vh; }
-        
-        .navbar {
+
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            font-family: var(--font-display);
+            margin: 0;
+            padding: 1.75rem;
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 1.5rem;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 1.25rem 1.75rem;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
         }
-        .navbar h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .brand-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+            color: var(--color-text-main);
+        }
+        .brand-badge {
+            background: var(--color-accent-subtle);
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.4rem;
+            border: 1px solid oklch(0.65 0.22 265 / 0.3);
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         .status-pill {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            padding: 0.4rem 0.8rem;
+            background: var(--color-success-subtle);
+            color: var(--color-success);
+            padding: 0.45rem 0.9rem;
             border-radius: 2rem;
-            font-size: 0.85rem;
+            font-size: 0.825rem;
             font-weight: 600;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            border: 1px solid oklch(0.72 0.19 155 / 0.3);
         }
-        .logout-btn {
-            color: var(--text-sub);
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-success);
+            box-shadow: 0 0 10px var(--color-success);
+        }
+
+        .logout-link {
+            color: var(--color-text-muted);
             text-decoration: none;
-            padding: 0.4rem 0.9rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--card-border);
+            padding: 0.45rem 1rem;
+            border-radius: 0.6rem;
+            border: 1px solid var(--color-border);
             font-size: 0.85rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
         }
-        .logout-btn:hover { background: var(--card-border); color: #fff; }
+        .logout-link:hover {
+            background: var(--color-surface-elevated);
+            color: var(--color-text-main);
+            border-color: var(--color-text-muted);
+        }
 
-        .dashboard-grid {
+        .bento-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            grid-template-columns: repeat(12, 1fr);
             gap: 1.5rem;
         }
 
-        .card {
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .bento-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            box-shadow: 0 8px 30px oklch(0 0 0 / 0.25);
+            display: flex;
+            flex-direction: column;
         }
+
+        .col-8 { grid-column: span 8; }
+        .col-4 { grid-column: span 4; }
+        .col-12 { grid-column: span 12; }
+
+        @media (max-width: 1024px) {
+            .col-8, .col-4 { grid-column: span 12; }
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.25rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--color-border-subtle);
         }
+
         .card-title {
             margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-sub);
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--color-text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--card-border); }
-        td { padding: 0.85rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
-        .app-name { font-weight: 600; color: #fff; display: block; }
-        .pkg-name { font-size: 0.75rem; color: var(--text-sub); }
+        .card-title-icon {
+            font-size: 1.1rem;
+        }
 
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 0.4rem;
+        /* Modern Table Styling */
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            color: var(--color-text-dim);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        td {
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid var(--color-border-subtle);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .app-title {
+            font-weight: 600;
+            color: var(--color-text-main);
+            display: block;
+        }
+
+        .app-package {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-text-dim);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.65rem;
+            border-radius: 0.5rem;
             font-size: 0.75rem;
             font-weight: 600;
         }
-        .badge-active { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .badge-blocked { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
 
-        .action-btns { display: flex; gap: 0.4rem; }
+        .badge-active {
+            background: var(--color-success-subtle);
+            color: var(--color-success);
+            border: 1px solid oklch(0.72 0.19 155 / 0.25);
+        }
+
+        .badge-blocked {
+            background: var(--color-danger-subtle);
+            color: var(--color-danger);
+            border: 1px solid oklch(0.62 0.22 25 / 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
         .btn {
-            padding: 0.45rem 0.85rem;
-            border-radius: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 0.5rem;
             border: none;
-            font-weight: 600;
+            font-family: var(--font-display);
             font-size: 0.8rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: var(--danger-hover); }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-success { background: var(--success); color: #fff; }
 
-        .screenshot-grid {
+        .btn-danger {
+            background: var(--color-danger);
+            color: #ffffff;
+        }
+        .btn-danger:hover {
+            background: var(--color-danger-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: #ffffff;
+        }
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Screenshot Matrix */
+        .screenshot-matrix {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.85rem;
         }
-        .screenshot-item {
-            background: #0d1322;
-            border-radius: 0.6rem;
-            overflow: hidden;
-            border: 1px solid var(--card-border);
-        }
-        .screenshot-item img { width: 100%; height: auto; display: block; }
-        .time-tag { font-size: 0.7rem; color: var(--text-sub); text-align: center; padding: 0.4rem; }
 
-        .log-list { list-style: none; padding: 0; margin: 0; }
-        .log-item {
+        .shot-card {
+            background: var(--color-bg);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .shot-card:hover {
+            transform: scale(1.03);
+            border-color: var(--color-accent);
+        }
+
+        .shot-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .shot-time {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--color-text-dim);
+            text-align: center;
+            padding: 0.4rem 0.2rem;
+            background: var(--color-surface);
+            border-top: 1px solid var(--color-border-subtle);
+        }
+
+        /* Log Feed */
+        .log-feed {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .log-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.65rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.85rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border-subtle);
+            font-size: 0.875rem;
         }
-        .log-time { color: var(--text-sub); font-size: 0.75rem; }
+
+        .log-event {
+            color: var(--color-text-main);
+        }
+
+        .log-timestamp {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-text-dim);
+        }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>🛡️ Family Security Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div id="deviceStatusContainer">
-                <span class="status-pill" style="background: rgba(148,163,184,0.1); color: var(--text-sub);">○ Loading...</span>
-            </div>
-            <a href="/logout" class="logout-btn">Logout</a>
+    <header class="header-bar">
+        <div class="brand-title">
+            <h1>🛡️ Family Sentinel Control</h1>
+            <span class="brand-badge">v1.2 · Active</span>
         </div>
-    </div>
+        <div class="header-actions">
+            <div id="deviceStatusContainer">
+                <span class="status-pill" style="background: var(--color-surface-elevated); color: var(--color-text-muted); border-color: var(--color-border);">
+                    Connecting...
+                </span>
+            </div>
+            <a href="/logout" class="logout-link">Sign Out</a>
+        </div>
+    </header>
 
     <div id="mainContainer">
-        <!-- Rendered dynamically via JavaScript without page reloads -->
+        <!-- Dynamic Client-Side Bento Layout Rendered via JS -->
     </div>
 
     <script>
@@ -184,9 +386,14 @@
             const mainContainer = document.getElementById('mainContainer');
 
             if (data.device) {
-                statusContainer.innerHTML = `<span class="status-pill">● Online: ${data.device.device_name}</span>`;
+                statusContainer.innerHTML = `
+                    <span class="status-pill">
+                        <span class="status-dot"></span>
+                        ${data.device.device_name}
+                    </span>
+                `;
                 
-                // Apps Rows
+                // Active Running Apps Table
                 let appsHtml = '';
                 if (data.running_apps && data.running_apps.length > 0) {
                     appsHtml = data.running_apps.map(app => {
@@ -194,18 +401,20 @@
                         return `
                             <tr>
                                 <td>
-                                    <span class="app-name">${app.app_name}</span>
-                                    <span class="pkg-name">${app.package_name}</span>
+                                    <span class="app-title">${app.app_name}</span>
+                                    <span class="app-package">${app.package_name}</span>
                                 </td>
                                 <td>
-                                    ${isBlocked ? '<span class="badge badge-blocked">Blocked</span>' : '<span class="badge badge-active">Active</span>'}
+                                    ${isBlocked ? 
+                                        '<span class="badge-status badge-blocked">Restricted</span>' : 
+                                        '<span class="badge-status badge-active">Active</span>'}
                                 </td>
                                 <td>
-                                    <div class="action-btns">
-                                        <button onclick="killApp('${app.package_name}')" class="btn btn-danger">End App</button>
+                                    <div class="btn-group">
+                                        <button onclick="killApp('${app.package_name}')" class="btn btn-danger">End Process</button>
                                         ${isBlocked ? 
                                             `<button onclick="unblockApp('${app.package_name}')" class="btn btn-success">Unblock</button>` : 
-                                            `<button onclick="blockApp('${app.package_name}')" class="btn btn-primary">Block</button>`
+                                            `<button onclick="blockApp('${app.package_name}')" class="btn btn-primary">Restrict</button>`
                                         }
                                     </div>
                                 </td>
@@ -213,112 +422,128 @@
                         `;
                     }).join('');
                 } else {
-                    appsHtml = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub); padding: 2rem;">No active application telemetry received yet.</td></tr>`;
+                    appsHtml = `<tr><td colspan="3" style="text-align: center; color: var(--color-text-dim); padding: 2rem;">No active application telemetry received.</td></tr>`;
                 }
 
-                // Screenshots
-                let screenshotsHtml = '';
-                if (data.screenshots && data.screenshots.length > 0) {
-                    screenshotsHtml = data.screenshots.map(s => `
-                        <div class="screenshot-item">
-                            <img src="data:image/jpeg;base64,${s.image_base64}" alt="Screen">
-                            <div class="time-tag">${s.captured_at}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    screenshotsHtml = `<div style="grid-column: 1 / -1; color: var(--text-sub); text-align: center; padding: 2rem;">No screenshots captured. Click Capture Screen above.</div>`;
-                }
-
-                // Logs
-                let logsHtml = '';
-                if (data.logs && data.logs.length > 0) {
-                    logsHtml = data.logs.map(l => `
-                        <li class="log-item">
-                            <span>${l.event}</span>
-                            <span class="log-time">${l.created_at}</span>
-                        </li>
-                    `).join('');
-                } else {
-                    logsHtml = `<li style="color: var(--text-sub); text-align: center; padding: 1rem;">No recent activities logged.</li>`;
-                }
-
-                // Blocked / Restricted Apps list (for unblocking even if not currently running)
+                // Restricted Apps Table (Active Policies)
                 let blockedHtml = '';
                 if (data.blocked_packages && data.blocked_packages.length > 0) {
                     blockedHtml = data.blocked_packages.map(pkg => `
                         <tr>
                             <td>
-                                <span class="app-name">${pkg}</span>
+                                <span class="app-package" style="font-size:0.85rem; color: var(--color-text-main);">${pkg}</span>
                             </td>
-                            <td><span class="badge badge-blocked">Restricted</span></td>
+                            <td><span class="badge-status badge-blocked">Restricted</span></td>
                             <td>
-                                <button onclick="unblockApp('${pkg}')" class="btn btn-success">Unblock App</button>
+                                <button onclick="unblockApp('${pkg}')" class="btn btn-success">Remove Restriction</button>
                             </td>
                         </tr>
                     `).join('');
                 } else {
-                    blockedHtml = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub); padding: 1rem;">No restricted applications. All apps permitted.</td></tr>`;
+                    blockedHtml = `<tr><td colspan="3" style="text-align: center; color: var(--color-text-dim); padding: 1.5rem;">No restricted applications. All packages permitted.</td></tr>`;
+                }
+
+                // Screenshots Matrix
+                let screenshotsHtml = '';
+                if (data.screenshots && data.screenshots.length > 0) {
+                    screenshotsHtml = data.screenshots.map(s => `
+                        <div class="shot-card">
+                            <img src="data:image/jpeg;base64,${s.image_base64}" alt="Screen Frame">
+                            <div class="shot-time">${s.captured_at}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    screenshotsHtml = `<div style="grid-column: 1 / -1; color: var(--color-text-dim); text-align: center; padding: 2.5rem;">No screen captures stored. Click Request Frame above.</div>`;
+                }
+
+                // Activity Log Feed
+                let logsHtml = '';
+                if (data.logs && data.logs.length > 0) {
+                    logsHtml = data.logs.map(l => `
+                        <li class="log-row">
+                            <span class="log-event">${l.event}</span>
+                            <span class="log-timestamp">${l.created_at}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    logsHtml = `<li style="color: var(--color-text-dim); text-align: center; padding: 1rem;">No recent activities logged.</li>`;
                 }
 
                 mainContainer.innerHTML = `
-                    <div class="dashboard-grid">
-                        <div class="card">
+                    <div class="bento-grid">
+                        <!-- Running Applications Card -->
+                        <div class="bento-card col-8">
                             <div class="card-header">
-                                <h2 class="card-title">📱 Running Applications & Remote Control</h2>
+                                <h2 class="card-title">
+                                    <span class="card-title-icon">📱</span> Real-Time App Telemetry & Remote Actions
+                                </h2>
                             </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Application</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${appsHtml}</tbody>
-                            </table>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Application & Package</th>
+                                            <th>State</th>
+                                            <th>Remote Command</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${appsHtml}</tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <div class="card">
+                        <!-- Live Screen Capture Card -->
+                        <div class="bento-card col-4">
                             <div class="card-header">
-                                <h2 class="card-title">🚫 Restricted Apps (Active Policies)</h2>
-                            </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Package Name</th>
-                                        <th>Policy Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${blockedHtml}</tbody>
-                            </table>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title">📸 Live Screen Monitoring</h2>
+                                <h2 class="card-title">
+                                    <span class="card-title-icon">📸</span> Live Screen Monitoring
+                                </h2>
                                 <button onclick="requestScreenshot()" class="btn btn-primary">
-                                    ${data.screenshot_pending ? 'Capturing...' : 'Capture Screen'}
+                                    ${data.screenshot_pending ? 'Capturing...' : 'Request Frame'}
                                 </button>
                             </div>
-                            <div class="screenshot-grid">${screenshotsHtml}</div>
+                            <div class="screenshot-matrix">${screenshotsHtml}</div>
                         </div>
 
-                        <div class="card" style="grid-column: 1 / -1;">
+                        <!-- Active Policies / Restricted Apps Card -->
+                        <div class="bento-card col-4">
                             <div class="card-header">
-                                <h2 class="card-title">📋 Remote Event & Activity Logs</h2>
+                                <h2 class="card-title">
+                                    <span class="card-title-icon">🚫</span> Restricted Apps (Active Policies)
+                                </h2>
                             </div>
-                            <ul class="log-list">${logsHtml}</ul>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Target Package</th>
+                                            <th>Policy</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${blockedHtml}</tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Activity Audit Feed Card -->
+                        <div class="bento-card col-8">
+                            <div class="card-header">
+                                <h2 class="card-title">
+                                    <span class="card-title-icon">📋</span> Audit Log & Security Events
+                                </h2>
+                            </div>
+                            <ul class="log-feed">${logsHtml}</ul>
                         </div>
                     </div>
                 `;
             } else {
-                statusContainer.innerHTML = `<span class="status-pill" style="background: rgba(148,163,184,0.1); color: var(--text-sub);">○ Waiting for device...</span>`;
+                statusContainer.innerHTML = `<span class="status-pill" style="background: var(--color-surface-elevated); color: var(--color-text-muted); border-color: var(--color-border);">○ Device Offline</span>`;
                 mainContainer.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 4rem 2rem;">
-                        <h2 style="color: #fff; margin-bottom: 0.5rem;">Waiting for Child Device Connection...</h2>
-                        <p style="color: var(--text-sub); margin-bottom: 1.5rem;">Configure the child Android application with this server URL and secret key.</p>
-                        <div style="display: inline-block; background: #0d1322; border: 1px solid var(--card-border); padding: 1rem; border-radius: 0.5rem; font-family: monospace; color: var(--primary);">
+                    <div class="bento-card col-12" style="text-align: center; padding: 5rem 2rem;">
+                        <h2 style="color: var(--color-text-main); font-size: 1.5rem; margin-bottom: 0.5rem;">Waiting for Child Device Telemetry...</h2>
+                        <p style="color: var(--color-text-muted); margin-bottom: 2rem;">Configure the child Android application with this server URL and secret key.</p>
+                        <div style="display: inline-block; background: var(--color-bg); border: 1px solid var(--color-border); padding: 1rem 1.5rem; border-radius: 0.75rem; font-family: var(--font-mono); color: var(--color-accent);">
                             Secret Auth Token: parental-secret-key-123
                         </div>
                     </div>
@@ -326,7 +551,7 @@
             }
         }
 
-        // AJAX Action Handlers (Zero Page Reloads)
+        // AJAX Handlers
         async function killApp(packageName) {
             await fetch('/api/action/kill_app', {
                 method: 'POST',
@@ -362,7 +587,7 @@
             fetchDashboardState();
         }
 
-        // Initial Load and 3-second Auto Poll
+        // Auto Poll every 3 seconds
         fetchDashboardState();
         setInterval(fetchDashboardState, 3000);
     </script>
