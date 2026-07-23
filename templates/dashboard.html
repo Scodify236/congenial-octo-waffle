@@ -3,166 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Control Admin Dashboard</title>
+    <title>Family Security & Device Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
+            --bg: #0b0f19;
+            --card: #151c2c;
+            --card-border: #232d42;
             --primary: #6366f1;
-            --danger: #ef4444;
+            --primary-hover: #4f46e5;
+            --danger: #f43f5e;
+            --danger-hover: #e11d48;
             --success: #10b981;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
         }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 1.5rem;
-        }
-        header {
+        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 1.5rem; min-height: 100vh; }
+        
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
             margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
-        .logout-btn { color: var(--text-muted); text-decoration: none; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 0.4rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
-        .card { background: var(--card-bg); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid var(--border); }
-        .card h2 { margin-top: 0; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        th { color: var(--text-muted); font-weight: 600; }
-        .btn { padding: 0.4rem 0.8rem; border-radius: 0.3rem; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .gallery img { width: 100%; border-radius: 0.5rem; border: 1px solid var(--border); }
-        .badge { padding: 0.2rem 0.5rem; border-radius: 0.2rem; font-size: 0.75rem; font-weight: bold; }
-        .badge-blocked { background: #ef444433; color: var(--danger); }
-        .badge-active { background: #10b98133; color: var(--success); }
+        .navbar h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.4rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .logout-btn {
+            color: var(--text-sub);
+            text-decoration: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--card-border);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover { background: var(--card-border); color: #fff; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .card-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--card-border); }
+        td { padding: 0.85rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
+        .app-name { font-weight: 600; color: #fff; display: block; }
+        .pkg-name { font-size: 0.75rem; color: var(--text-sub); }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-active { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .badge-blocked { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+
+        .action-btns { display: flex; gap: 0.4rem; }
+        .btn {
+            padding: 0.45rem 0.85rem;
+            border-radius: 0.4rem;
+            border: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: var(--danger-hover); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: #fff; }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        .screenshot-item {
+            background: #0d1322;
+            border-radius: 0.6rem;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+        .screenshot-item img { width: 100%; height: auto; display: block; }
+        .time-tag { font-size: 0.7rem; color: var(--text-sub); text-align: center; padding: 0.4rem; }
+
+        .log-list { list-style: none; padding: 0; margin: 0; }
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.85rem;
+        }
+        .log-time { color: var(--text-sub); font-size: 0.75rem; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🛡️ Self-Hosted Family Control</h1>
-        <div>
-            {% if device %}
-            <span style="margin-right: 1rem; font-size: 0.9rem; color: var(--success);">● Device Online: <strong>{{ device.device_name }}</strong></span>
-            {% else %}
-            <span style="margin-right: 1rem; font-size: 0.9rem; color: var(--text-muted);">○ Waiting for child app connection...</span>
-            {% endif %}
+    <div class="navbar">
+        <h1>🛡️ Family Security Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="deviceStatusContainer">
+                <span class="status-pill" style="background: rgba(148,163,184,0.1); color: var(--text-sub);">○ Loading...</span>
+            </div>
             <a href="/logout" class="logout-btn">Logout</a>
         </div>
-    </header>
+    </div>
 
-    {% if device %}
-    <div class="grid">
-        <!-- Running Apps Section -->
-        <div class="card">
-            <h2>📱 Active & Running Apps</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>App Name</th>
-                        <th>Package</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for app in running_apps %}
-                    <tr>
-                        <td><strong>{{ app.app_name }}</strong></td>
-                        <td style="color: var(--text-muted); font-size: 0.8rem;">{{ app.package_name }}</td>
-                        <td>
-                            {% if app.package_name in policy.blocked_packages %}
-                            <span class="badge badge-blocked">Blocked</span>
-                            {% else %}
-                            <span class="badge badge-active">Active</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 0.4rem;">
-                                <form action="/action/kill_app" method="POST" style="margin:0;">
-                                    <input type="hidden" name="device_id" value="{{ device.device_id }}">
-                                    <input type="hidden" name="package_name" value="{{ app.package_name }}">
-                                    <button type="submit" class="btn btn-danger">Close</button>
-                                </form>
-                                {% if app.package_name in policy.blocked_packages %}
-                                <form action="/action/unblock_app" method="POST" style="margin:0;">
-                                    <input type="hidden" name="device_id" value="{{ device.device_id }}">
-                                    <input type="hidden" name="package_name" value="{{ app.package_name }}">
-                                    <button type="submit" class="btn btn-success">Unblock</button>
-                                </form>
-                                {% else %}
-                                <form action="/action/block_app" method="POST" style="margin:0;">
-                                    <input type="hidden" name="device_id" value="{{ device.device_id }}">
-                                    <input type="hidden" name="package_name" value="{{ app.package_name }}">
-                                    <button type="submit" class="btn btn-primary">Block</button>
-                                </form>
-                                {% endif %}
+    <div id="mainContainer">
+        <!-- Rendered dynamically via JavaScript without page reloads -->
+    </div>
+
+    <script>
+        async function fetchDashboardState() {
+            try {
+                const res = await fetch('/api/dashboard/state');
+                if (!res.ok) {
+                    if (res.status === 401) window.location.href = '/login';
+                    return;
+                }
+                const data = await res.json();
+                renderDashboard(data);
+            } catch (err) {
+                console.error("Error fetching state:", err);
+            }
+        }
+
+        function renderDashboard(data) {
+            const statusContainer = document.getElementById('deviceStatusContainer');
+            const mainContainer = document.getElementById('mainContainer');
+
+            if (data.device) {
+                statusContainer.innerHTML = `<span class="status-pill">● Online: ${data.device.device_name}</span>`;
+                
+                // Apps Rows
+                let appsHtml = '';
+                if (data.running_apps && data.running_apps.length > 0) {
+                    appsHtml = data.running_apps.map(app => {
+                        const isBlocked = data.blocked_packages.includes(app.package_name);
+                        return `
+                            <tr>
+                                <td>
+                                    <span class="app-name">${app.app_name}</span>
+                                    <span class="pkg-name">${app.package_name}</span>
+                                </td>
+                                <td>
+                                    ${isBlocked ? '<span class="badge badge-blocked">Blocked</span>' : '<span class="badge badge-active">Active</span>'}
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button onclick="killApp('${app.package_name}')" class="btn btn-danger">End App</button>
+                                        ${isBlocked ? 
+                                            `<button onclick="unblockApp('${app.package_name}')" class="btn btn-success">Unblock</button>` : 
+                                            `<button onclick="blockApp('${app.package_name}')" class="btn btn-primary">Block</button>`
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    appsHtml = `<tr><td colspan="3" style="text-align: center; color: var(--text-sub); padding: 2rem;">No active application telemetry received yet.</td></tr>`;
+                }
+
+                // Screenshots
+                let screenshotsHtml = '';
+                if (data.screenshots && data.screenshots.length > 0) {
+                    screenshotsHtml = data.screenshots.map(s => `
+                        <div class="screenshot-item">
+                            <img src="data:image/jpeg;base64,${s.image_base64}" alt="Screen">
+                            <div class="time-tag">${s.captured_at}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    screenshotsHtml = `<div style="grid-column: 1 / -1; color: var(--text-sub); text-align: center; padding: 2rem;">No screenshots captured. Click Capture Screen above.</div>`;
+                }
+
+                // Logs
+                let logsHtml = '';
+                if (data.logs && data.logs.length > 0) {
+                    logsHtml = data.logs.map(l => `
+                        <li class="log-item">
+                            <span>${l.event}</span>
+                            <span class="log-time">${l.created_at}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    logsHtml = `<li style="color: var(--text-sub); text-align: center; padding: 1rem;">No recent activities logged.</li>`;
+                }
+
+                mainContainer.innerHTML = `
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">📱 Running Applications & Remote Control</h2>
                             </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No active app telemetry received yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Application</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${appsHtml}</tbody>
+                            </table>
+                        </div>
 
-        <!-- Screenshots Section -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>📸 Device Screenshots</h2>
-                <form action="/action/request_screenshot" method="POST" style="margin:0;">
-                    <input type="hidden" name="device_id" value="{{ device.device_id }}">
-                    <button type="submit" class="btn btn-primary">{% if policy.screenshot_pending %}Capturing...{% else %}Capture Screen{% endif %}</button>
-                </form>
-            </div>
-            <div class="gallery">
-                {% for shot in screenshots %}
-                <div>
-                    <img src="data:image/jpeg;base64,{{ shot.image_base64 }}" alt="Screenshot">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 0.2rem;">{{ shot.captured_at }}</div>
-                </div>
-                {% else %}
-                <div style="grid-column: 1 / -1; color: var(--text-muted); text-align: center; padding: 2rem;">
-                    No screenshots captured. Click 'Capture Screen' to request a live frame from child device.
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">📸 Live Screen Monitoring</h2>
+                                <button onclick="requestScreenshot()" class="btn btn-primary">
+                                    ${data.screenshot_pending ? 'Capturing...' : 'Capture Screen'}
+                                </button>
+                            </div>
+                            <div class="screenshot-grid">${screenshotsHtml}</div>
+                        </div>
 
-        <!-- Activity Feed -->
-        <div class="card" style="grid-column: 1 / -1;">
-            <h2>📋 Family Activity Log</h2>
-            <ul style="list-style: none; padding: 0; margin: 0;">
-                {% for log in logs %}
-                <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; justify-content: space-between;">
-                    <span>{{ log.event }}</span>
-                    <span style="color: var(--text-muted);">{{ log.created_at }}</span>
-                </li>
-                {% else %}
-                <li style="color: var(--text-muted);">No activity logged yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    {% else %}
-    <div class="card" style="text-align: center; padding: 3rem;">
-        <h2>Waiting for child device...</h2>
-        <p style="color: var(--text-muted);">Configure the child Android application with this server URL and secret key.</p>
-    </div>
-    {% endif %}
+                        <div class="card" style="grid-column: 1 / -1;">
+                            <div class="card-header">
+                                <h2 class="card-title">📋 Remote Event & Activity Logs</h2>
+                            </div>
+                            <ul class="log-list">${logsHtml}</ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                statusContainer.innerHTML = `<span class="status-pill" style="background: rgba(148,163,184,0.1); color: var(--text-sub);">○ Waiting for device...</span>`;
+                mainContainer.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="color: #fff; margin-bottom: 0.5rem;">Waiting for Child Device Connection...</h2>
+                        <p style="color: var(--text-sub); margin-bottom: 1.5rem;">Configure the child Android application with this server URL and secret key.</p>
+                        <div style="display: inline-block; background: #0d1322; border: 1px solid var(--card-border); padding: 1rem; border-radius: 0.5rem; font-family: monospace; color: var(--primary);">
+                            Secret Auth Token: parental-secret-key-123
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // AJAX Action Handlers (Zero Page Reloads)
+        async function killApp(packageName) {
+            await fetch('/api/action/kill_app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ package_name: packageName })
+            });
+            fetchDashboardState();
+        }
+
+        async function blockApp(packageName) {
+            await fetch('/api/action/block_app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ package_name: packageName })
+            });
+            fetchDashboardState();
+        }
+
+        async function unblockApp(packageName) {
+            await fetch('/api/action/unblock_app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ package_name: packageName })
+            });
+            fetchDashboardState();
+        }
+
+        async function requestScreenshot() {
+            await fetch('/api/action/request_screenshot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            fetchDashboardState();
+        }
+
+        // Initial Load and 3-second Auto Poll
+        fetchDashboardState();
+        setInterval(fetchDashboardState, 3000);
+    </script>
 </body>
 </html>

@@ -72,46 +72,95 @@ def logout():
     response.delete_cookie("auth_session")
     return response
 
-# Dashboard Actions
+# --- AJAX Dashboard Endpoints (No Page Reload) ---
 
+@app.get("/api/dashboard/state")
+def get_dashboard_state(request: Request):
+    if not is_authenticated(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return {
+        "device": memory_store["device"],
+        "running_apps": memory_store["running_apps"],
+        "blocked_packages": memory_store["blocked_packages"],
+        "screenshot_pending": memory_store["screenshot_pending"],
+        "screenshots": memory_store["screenshots"],
+        "logs": memory_store["logs"]
+    }
+
+class PackageActionPayload(BaseModel):
+    package_name: str
+
+@app.post("/api/action/block_app")
+def api_block_app(payload: PackageActionPayload, request: Request):
+    if not is_authenticated(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    if payload.package_name not in memory_store["blocked_packages"]:
+        memory_store["blocked_packages"].append(payload.package_name)
+        log_event(f"Blocked package: {payload.package_name}")
+    return {"status": "ok", "blocked_packages": memory_store["blocked_packages"]}
+
+@app.post("/api/action/unblock_app")
+def api_unblock_app(payload: PackageActionPayload, request: Request):
+    if not is_authenticated(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    if payload.package_name in memory_store["blocked_packages"]:
+        memory_store["blocked_packages"].remove(payload.package_name)
+        log_event(f"Unblocked package: {payload.package_name}")
+    return {"status": "ok", "blocked_packages": memory_store["blocked_packages"]}
+
+@app.post("/api/action/kill_app")
+def api_kill_app(payload: PackageActionPayload, request: Request):
+    if not is_authenticated(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    if payload.package_name not in memory_store["kill_commands"]:
+        memory_store["kill_commands"].append(payload.package_name)
+        log_event(f"Requested remote close for: {payload.package_name}")
+    return {"status": "ok"}
+
+@app.post("/api/action/request_screenshot")
+def api_request_screenshot(request: Request):
+    if not is_authenticated(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    memory_store["screenshot_pending"] = True
+    log_event("Requested live screenshot capture")
+    return {"status": "ok"}
+
+# Form fallbacks for standard posts
 @app.post("/action/block_app")
 def block_app(request: Request, package_name: str = Form(...)):
     if not is_authenticated(request):
         return RedirectResponse(url="/login", status_code=303)
-    
     if package_name not in memory_store["blocked_packages"]:
         memory_store["blocked_packages"].append(package_name)
         log_event(f"Blocked package: {package_name}")
-        
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/action/unblock_app")
 def unblock_app(request: Request, package_name: str = Form(...)):
     if not is_authenticated(request):
         return RedirectResponse(url="/login", status_code=303)
-    
     if package_name in memory_store["blocked_packages"]:
         memory_store["blocked_packages"].remove(package_name)
         log_event(f"Unblocked package: {package_name}")
-        
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/action/kill_app")
 def kill_app(request: Request, package_name: str = Form(...)):
     if not is_authenticated(request):
         return RedirectResponse(url="/login", status_code=303)
-    
     if package_name not in memory_store["kill_commands"]:
         memory_store["kill_commands"].append(package_name)
         log_event(f"Requested remote close for: {package_name}")
-        
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/action/request_screenshot")
 def request_screenshot(request: Request):
     if not is_authenticated(request):
         return RedirectResponse(url="/login", status_code=303)
-    
     memory_store["screenshot_pending"] = True
     log_event("Requested live screenshot capture")
     return RedirectResponse(url="/", status_code=303)
@@ -135,7 +184,6 @@ def api_sync(
     if x_auth_token != SECRET_TOKEN:
         raise HTTPException(status_code=401, detail="Invalid hardcoded token")
 
-    # Update memory store
     memory_store["device"] = {
         "device_id": payload.device_id,
         "device_name": payload.device_name,
@@ -147,9 +195,8 @@ def api_sync(
         for item in payload.running_apps
     ]
     
-    # Read pending kill commands
     active_kills = list(memory_store["kill_commands"])
-    memory_store["kill_commands"].clear() # clear queue
+    memory_store["kill_commands"].clear()
     
     return {
         "status": "ok",
@@ -175,7 +222,7 @@ def upload_screenshot(
         "image_base64": payload.image_base64,
         "captured_at": timestamp
     })
-    memory_store["screenshots"] = memory_store["screenshots"][:8] # keep last 8
+    memory_store["screenshots"] = memory_store["screenshots"][:8]
     memory_store["screenshot_pending"] = False
     
     log_event("Uploaded fresh screenshot frame")
