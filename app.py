@@ -46,8 +46,7 @@ def index(request: Request):
         "screenshot_pending": memory_store["screenshot_pending"]
     }
     
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request=request, name="dashboard.html", context={
         "device": memory_store["device"],
         "running_apps": memory_store["running_apps"],
         "policy": policy,
@@ -57,7 +56,7 @@ def index(request: Request):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request, "error": None})
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": None})
 
 @app.post("/login", response_class=HTMLResponse)
 def login_submit(request: Request, password: str = Form(...)):
@@ -65,7 +64,7 @@ def login_submit(request: Request, password: str = Form(...)):
         response = RedirectResponse(url="/", status_code=303)
         response.set_cookie("auth_session", SECRET_TOKEN, httponly=True)
         return response
-    return templates.TemplateResponse("login.html", {"request": request, "error": "Incorrect admin password"})
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": "Incorrect admin password"})
 
 @app.get("/logout")
 def logout():
